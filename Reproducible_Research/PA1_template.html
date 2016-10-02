@@ -134,10 +134,8 @@ $(document).ready(function () {
 <div id="reading-data" class="section level3">
 <h3>1) Reading data</h3>
 <pre class="r"><code>setwd(&quot;C:/Users/Claudio.Caponera/OneDrive for Business/Documents/datascience/Reproducible_Research&quot;)</code></pre>
-<p>data &lt;- read.table(unz(“repdata-data-activity.zip”, “activity.csv”), header=T, quote=“&quot;”, sep=“,”)</p>
 <pre class="r"><code>data &lt;- read.table(unz(&quot;repdata-data-activity.zip&quot;, &quot;activity.csv&quot;), 
     header=T, quote=&quot;\&quot;&quot;, sep=&quot;,&quot;)</code></pre>
-<p>summary(data)</p>
 <pre class="r"><code>summary(data)</code></pre>
 <pre><code>##      steps                date          interval     
 ##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0  
@@ -148,14 +146,12 @@ $(document).ready(function () {
 ##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0  
 ##  NA's   :2304     (Other)   :15840</code></pre>
 <pre class="r"><code>data$date &lt;- as.Date(data$date) </code></pre>
-<p>str(data)</p>
 <pre class="r"><code>str(data)</code></pre>
 <pre><code>## 'data.frame':    17568 obs. of  3 variables:
 ##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
 ##  $ date    : Date, format: &quot;2012-10-01&quot; &quot;2012-10-01&quot; ...
 ##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...</code></pre>
 <pre class="r"><code># 17568 obs. of  3 variables</code></pre>
-<p>head(data)</p>
 <pre class="r"><code>head(data)</code></pre>
 <pre><code>##   steps       date interval
 ## 1    NA 2012-10-01        0
@@ -164,7 +160,6 @@ $(document).ready(function () {
 ## 4    NA 2012-10-01       15
 ## 5    NA 2012-10-01       20
 ## 6    NA 2012-10-01       25</code></pre>
-<p>tail(data)</p>
 <pre class="r"><code>tail(data)</code></pre>
 <pre><code>##       steps       date interval
 ## 17563    NA 2012-11-30     2330
@@ -176,8 +171,6 @@ $(document).ready(function () {
 </div>
 <div id="missing-values" class="section level3">
 <h3>2) Missing values</h3>
-<p>dataOK &lt;- na.omit(data)</p>
-<p>str(dataOK)</p>
 <pre class="r"><code>dataOK &lt;- na.omit(data)
 str(dataOK)</code></pre>
 <pre><code>## 'data.frame':    15264 obs. of  3 variables:
@@ -187,7 +180,6 @@ str(dataOK)</code></pre>
 ##  - attr(*, &quot;na.action&quot;)=Class 'omit'  Named int [1:2304] 1 2 3 4 5 6 7 8 9 10 ...
 ##   .. ..- attr(*, &quot;names&quot;)= chr [1:2304] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...</code></pre>
 <pre class="r"><code>#15264 obs. of  3 variables</code></pre>
-<p>head(dataOK)</p>
 <pre class="r"><code>head(dataOK)</code></pre>
 <pre><code>##     steps       date interval
 ## 289     0 2012-10-02        0
@@ -199,11 +191,6 @@ str(dataOK)</code></pre>
 </div>
 <div id="calculating-total-number-of-steps-taken-per-day---making-histogram" class="section level3">
 <h3>3) Calculating total number of steps taken per day - Making histogram</h3>
-<p>days = length(unique(dataOK[,2]))</p>
-<p>library(doBy)</p>
-<p>steps_sum &lt;- summaryBy(steps ~ date, data = dataOK, FUN = function(x) { c(m = sum(x)) } )</p>
-<p>names(steps_sum)[names(steps_sum)==“steps.m”] &lt;- “steps.s”</p>
-<p>hist( steps_sum$steps.s,breaks=10,xlab=“Total number of steps taken per day”)</p>
 <pre class="r"><code>#counting distinct days
 days = length(unique(dataOK[,2]))
 days</code></pre>
@@ -220,20 +207,13 @@ hist(   steps_sum$steps.s, breaks=10, xlab=&quot;Total number of steps taken per
 </div>
 <div id="calculating-and-reporting-mean-and-median-of-total-number-of-steps-taken-per-day" class="section level3">
 <h3>4) Calculating and reporting mean and median of total number of steps taken per day</h3>
-<p>mean(steps_sum$steps.s)</p>
 <pre class="r"><code>mean(steps_sum$steps.s) </code></pre>
 <pre><code>## [1] 10766.19</code></pre>
-<p>median(steps_sum$steps.s)</p>
 <pre class="r"><code>median(steps_sum$steps.s) </code></pre>
 <pre><code>## [1] 10765</code></pre>
 </div>
 <div id="calculate-and-plot-average-steps-for-each-of-5-minute-interval" class="section level3">
 <h3>5) Calculate and plot average steps for each of 5-minute interval</h3>
-<p>library(doBy)</p>
-<p>steps_avg &lt;- summaryBy(steps ~ interval, data = dataOK, FUN = function(x) { c(m = mean(x)) } )</p>
-<p>names(steps_avg)[names(steps_avg)==“steps.m”] &lt;- “stepsavg”</p>
-<p>library(ggplot2)</p>
-<p>qplot(x=interval, y=stepsavg, data = steps_avg, geom = “line”, xlab=“5-minute interval”, ylab=“average number of steps taken, averaged across all days”, main=“Average number of steps by interval” )</p>
 <pre class="r"><code>library(doBy)
 steps_avg &lt;- summaryBy(steps ~ interval, data = dataOK, 
     FUN = function(x) { c(m = mean(x)) } )
@@ -252,15 +232,12 @@ library(ggplot2)</code></pre>
 </div>
 <div id="which-5-minute-interval-on-average-across-all-the-days-in-the-dataset-contains-the-maximum-number-of-steps" class="section level3">
 <h3>6) Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?</h3>
-<p>steps_avg[which.max(steps_avg$stepsavg), ]</p>
 <pre class="r"><code>steps_avg[which.max(steps_avg$stepsavg), ]</code></pre>
 <pre><code>##     interval stepsavg
 ## 104      835 206.1698</code></pre>
 </div>
 <div id="dealing-with-missing-values-there-are-a-number-of-daysintervals-where-there-are-missing-values-coded-as-na." class="section level3">
 <h3>7) Dealing with missing values: there are a number of days/intervals where there are missing values (coded as NA).</h3>
-<p>missing_steps &lt;- subset(data, is.na(data$steps))</p>
-<p>str(missing_steps)</p>
 <pre class="r"><code>#7a) Calculate and report the total number of missing values in the dataset
 
 missing_steps &lt;- subset(data, is.na(data$steps))
@@ -270,8 +247,6 @@ str(missing_steps)</code></pre>
 ##  $ date    : Date, format: &quot;2012-10-01&quot; &quot;2012-10-01&quot; ...
 ##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...</code></pre>
 <pre class="r"><code># 2304 obs. of  3 variables</code></pre>
-<p>missing_date &lt;- subset(data, is.na(data$date))</p>
-<p>str(missing_date)</p>
 <pre class="r"><code>missing_date &lt;- subset(data, is.na(data$date))
 str(missing_date)</code></pre>
 <pre><code>## 'data.frame':    0 obs. of  3 variables:
@@ -279,8 +254,6 @@ str(missing_date)</code></pre>
 ##  $ date    :Class 'Date'  num(0) 
 ##  $ interval: int</code></pre>
 <pre class="r"><code>#0 obs. of  3 variables</code></pre>
-<p>missing_int &lt;- subset(data, is.na(data$interval))</p>
-<p>str(missing_int)</p>
 <pre class="r"><code>missing_int &lt;- subset(data, is.na(data$interval))
 str(missing_int)</code></pre>
 <pre><code>## 'data.frame':    0 obs. of  3 variables:
@@ -289,20 +262,6 @@ str(missing_int)</code></pre>
 ##  $ interval: int</code></pre>
 <pre class="r"><code>#0 obs. of  3 variables</code></pre>
 <p>Conclusion: only in ‘steps’ column there are NA’s. Where ‘steps’ is missing, this will be now replaced with the median</p>
-<p>library(doBy)</p>
-<p>steps_med &lt;- summaryBy(steps ~ interval, data = dataOK, FUN = function(x) { c(m = median(x)) } )</p>
-<p>names(steps_med)[names(steps_med)==“steps.m”] &lt;- “stepsmed”</p>
-<p>missing_steps_repl &lt;- merge(missing_steps,steps_med,by=“interval”)</p>
-<p>myvars &lt;- c(“interval”, “date”, “stepsmed”)</p>
-<p>missing_steps_OK &lt;- missing_steps_repl[myvars]</p>
-<p>names(missing_steps_OK)[names(missing_steps_OK)==“stepsmed”] &lt;- “steps”</p>
-<p>library(doBy)</p>
-<p>steps_med &lt;- summaryBy(steps ~ interval, data = dataOK, FUN = function(x) { c(m = median(x)) } )</p>
-<p>names(steps_med)[names(steps_med)==“steps.m”] &lt;- “stepsmed”</p>
-<p>missing_steps_repl &lt;- merge(missing_steps,steps_med,by=“interval”)</p>
-<p>myvars &lt;- c(“interval”, “date”, “stepsmed”)</p>
-<p>missing_steps_OK &lt;- missing_steps_repl[myvars]</p>
-<p>names(missing_steps_OK)[names(missing_steps_OK)==“stepsmed”] &lt;- “steps”</p>
 <pre class="r"><code>##7b) Where steps is missing, replacing with median.
 
 library(doBy)
@@ -337,9 +296,7 @@ names(missing_steps_OK)[names(missing_steps_OK)==&quot;stepsmed&quot;] &lt;- &qu
 </div>
 <div id="a-create-a-new-dataset-that-is-equal-to-the-original-dataset-but-with-the-missing-data-filled-in." class="section level3">
 <h3>7a) Create a new dataset that is equal to the original dataset but with the missing data filled in.</h3>
-<p>data_repl &lt;- rbind(dataOK,missing_steps_OK)</p>
 <pre class="r"><code>data_repl &lt;- rbind(dataOK,missing_steps_OK)</code></pre>
-<p>summary(data_repl)</p>
 <pre class="r"><code>summary(data_repl)</code></pre>
 <pre><code>##      steps          date               interval     
 ##  Min.   :  0   Min.   :2012-10-01   Min.   :   0.0  
@@ -348,7 +305,6 @@ names(missing_steps_OK)[names(missing_steps_OK)==&quot;stepsmed&quot;] &lt;- &qu
 ##  Mean   : 33   Mean   :2012-10-31   Mean   :1177.5  
 ##  3rd Qu.:  8   3rd Qu.:2012-11-15   3rd Qu.:1766.2  
 ##  Max.   :806   Max.   :2012-11-30   Max.   :2355.0</code></pre>
-<p>summary(dataOK)</p>
 <pre class="r"><code>summary(dataOK)</code></pre>
 <pre><code>##      steps             date               interval     
 ##  Min.   :  0.00   Min.   :2012-10-02   Min.   :   0.0  
@@ -360,10 +316,6 @@ names(missing_steps_OK)[names(missing_steps_OK)==&quot;stepsmed&quot;] &lt;- &qu
 </div>
 <div id="b-make-a-histogram-of-the-total-number-of-steps-taken-each-day-and-calculate-and-report-the-mean-and-median-total-number-of-steps-taken-per-day." class="section level3">
 <h3>7b) Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.</h3>
-<p>library(doBy)</p>
-<p>steps_sum_repl &lt;- summaryBy(steps ~ date, data = data_repl, FUN = function(x) { c(m = sum(x)) } )</p>
-<p>names(steps_sum_repl)[names(steps_sum_repl)==“steps.m”] &lt;- “steps.s”</p>
-<p>hist( steps_sum_repl$steps.s, breaks=10, xlab=“Total number of steps taken per day (NAs replaced with median)”)</p>
 <pre class="r"><code># d1) Calculating total number of steps taken per day - making histogram
 
 library(doBy)
@@ -381,18 +333,13 @@ hist(   steps_sum_repl$steps.s,
 </div>
 <div id="c-calculating-and-reporting-mean-and-median-of-total-number-of-steps-taken-per-day" class="section level3">
 <h3>7c) Calculating and reporting mean and median of total number of steps taken per day</h3>
-<p>mean(steps_sum_repl$steps.s)</p>
 <pre class="r"><code>mean(steps_sum_repl$steps.s) </code></pre>
 <pre><code>## [1] 9503.869</code></pre>
-<p>median(steps_sum_repl$steps.s)</p>
 <pre class="r"><code>median(steps_sum_repl$steps.s) </code></pre>
 <pre><code>## [1] 10395</code></pre>
 </div>
 <div id="a-create-a-new-factor-variable-in-the-dataset-with-two-levels-weekday-and-weekend-indicating-whether-a-given-date-is-a-weekday-or-weekend-day.used-the-dataset-with-the-filled-in-missing-values-for-this-part." class="section level3">
 <h3>8a) Create a new factor variable in the dataset with two levels, weekday and weekend, indicating whether a given date is a weekday or weekend day.Used the dataset with the filled-in missing values for this part.</h3>
-<p>weektime &lt;- ifelse((data_repl$date) %in% c(“sabato”,“domenica”),“weekend”,“weekday”)</p>
-<p>data_repl2 &lt;- cbind(data_repl,weektime)</p>
-<p>table(data_repl2$weektime)</p>
 <pre class="r"><code>data_repl$date &lt;- weekdays(as.Date(data_repl$date))
 
 weektime &lt;- ifelse((data_repl$date) %in% c(&quot;sabato&quot;,&quot;domenica&quot;),&quot;weekend&quot;,&quot;weekday&quot;)
@@ -405,11 +352,6 @@ table(data_repl2$weektime)</code></pre>
 </div>
 <div id="b-make-a-panel-plot-containing-a-time-series-plot-of-the-5-minute-interval-x-axis-and-the-average-number-of-steps-taken-averaged-across-all-weekday-days-or-weekend-days-y-axis.used-the-dataset-with-the-filled-in-missing-values-for-this-part." class="section level3">
 <h3>8b) Make a panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).Used the dataset with the filled-in missing values for this part.</h3>
-<p>library(doBy)</p>
-<p>steps_avg_final &lt;- summaryBy(steps ~ interval + weektime, data = data_repl2, FUN = function(x) { c(m = mean(x)) } )</p>
-<p>names(steps_avg_final)[names(steps_avg_final)==“steps.m”] &lt;- “stepsavg”</p>
-<p>library(“lattice”)</p>
-<p>p &lt;- xyplot(stepsavg ~ interval | factor(weektime), data=steps_avg_final, type = ‘l’, main=“Average number of steps (split by weekdays and weekend days”, xlab=“5-minute interval”, ylab=“Average number of steps”) print (p)</p>
 <pre class="r"><code>library(doBy)
 steps_avg_final &lt;- summaryBy(steps ~ interval + weektime, data = data_repl2, 
     FUN = function(x) { c(m = mean(x)) } )

@@ -24,16 +24,11 @@ The variables included in this dataset are:
 setwd("C:/Users/Claudio.Caponera/OneDrive for Business/Documents/datascience/Reproducible_Research")
 ```
 
-data <- read.table(unz("repdata-data-activity.zip", "activity.csv"), 
-	header=T, quote="\"", sep=",")
-
 
 ```r
 data <- read.table(unz("repdata-data-activity.zip", "activity.csv"), 
 	header=T, quote="\"", sep=",")
 ```
-
-summary(data)
 
 
 ```r
@@ -55,8 +50,6 @@ summary(data)
 data$date <- as.Date(data$date) 
 ```
 
-str(data)
-
 
 ```r
 str(data)
@@ -73,8 +66,6 @@ str(data)
 # 17568 obs. of  3 variables
 ```
 
-head(data)
-
 
 ```r
 head(data)
@@ -89,8 +80,6 @@ head(data)
 ## 5    NA 2012-10-01       20
 ## 6    NA 2012-10-01       25
 ```
-
-tail(data)
 
 
 ```r
@@ -108,10 +97,6 @@ tail(data)
 ```
 
 ###2) Missing values
-
-dataOK <- na.omit(data)
-
-str(dataOK)
 
 
 ```r
@@ -132,8 +117,6 @@ str(dataOK)
 #15264 obs. of  3 variables
 ```
 
-head(dataOK)
-
 
 ```r
 head(dataOK)
@@ -151,16 +134,6 @@ head(dataOK)
 
 
 ###3) Calculating total number of steps taken per day - Making histogram
-
-days = length(unique(dataOK[,2]))
-
-library(doBy)
-
-steps_sum <- summaryBy(steps ~ date, data = dataOK, FUN = function(x) { c(m = sum(x)) } )
-
-names(steps_sum)[names(steps_sum)=="steps.m"] <- "steps.s"
-
-hist(	steps_sum$steps.s,breaks=10,xlab="Total number of steps taken per day")
 
 
 ```r
@@ -195,7 +168,6 @@ hist(	steps_sum$steps.s, breaks=10, xlab="Total number of steps taken per day")
 
 ###4) Calculating and reporting mean and median of total number of steps taken per day
 
-mean(steps_sum$steps.s)
 
 ```r
 mean(steps_sum$steps.s) 
@@ -205,7 +177,6 @@ mean(steps_sum$steps.s)
 ## [1] 10766.19
 ```
 
-median(steps_sum$steps.s) 
 
 ```r
 median(steps_sum$steps.s) 
@@ -217,21 +188,6 @@ median(steps_sum$steps.s)
 
 ###5) Calculate and plot average steps for each of 5-minute interval
 
-library(doBy)
-
-steps_avg <- summaryBy(steps ~ interval, data = dataOK, 
- 	FUN = function(x) { c(m = mean(x)) } )
-
-names(steps_avg)[names(steps_avg)=="steps.m"] <- "stepsavg"
-
-library(ggplot2)
-
-qplot(x=interval, y=stepsavg, data = steps_avg,  geom = "line",
-      xlab="5-minute interval",
-      ylab="average number of steps taken, averaged across all days",
-      main="Average number of steps by interval"
-      )
-      
 
 ```r
 library(doBy)
@@ -260,7 +216,6 @@ qplot(x=interval, y=stepsavg, data = steps_avg,  geom = "line",
 
 ###6) Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-steps_avg[which.max(steps_avg$stepsavg), ]
 
 ```r
 steps_avg[which.max(steps_avg$stepsavg), ]
@@ -273,9 +228,6 @@ steps_avg[which.max(steps_avg$stepsavg), ]
 
 ###7) Dealing with missing values: there are a number of days/intervals where there are missing values (coded as NA).
 
-missing_steps <- subset(data, is.na(data$steps))
-
-str(missing_steps)
 
 ```r
 #7a) Calculate and report the total number of missing values in the dataset
@@ -295,9 +247,6 @@ str(missing_steps)
 # 2304 obs. of  3 variables
 ```
 
-missing_date <- subset(data, is.na(data$date))
-
-str(missing_date)
 
 ```r
 missing_date <- subset(data, is.na(data$date))
@@ -315,9 +264,6 @@ str(missing_date)
 #0 obs. of  3 variables
 ```
 
-missing_int <- subset(data, is.na(data$interval))
-
-str(missing_int)
 
 ```r
 missing_int <- subset(data, is.na(data$interval))
@@ -335,36 +281,6 @@ str(missing_int)
 #0 obs. of  3 variables
 ```
 Conclusion: only in 'steps' column there are NA's. Where 'steps' is missing, this will be now replaced with the median
-
-library(doBy)
-
-steps_med <- summaryBy(steps ~ interval, data = dataOK, 
- 	FUN = function(x) { c(m = median(x)) } )
-
-names(steps_med)[names(steps_med)=="steps.m"] <- "stepsmed"
-
-missing_steps_repl <- merge(missing_steps,steps_med,by="interval")
-
-myvars <- c("interval", "date", "stepsmed")
-
-missing_steps_OK <- missing_steps_repl[myvars]
-
-names(missing_steps_OK)[names(missing_steps_OK)=="stepsmed"] <- "steps" 
-
-library(doBy)
-
-steps_med <- summaryBy(steps ~ interval, data = dataOK, 
- 	FUN = function(x) { c(m = median(x)) } )
-
-names(steps_med)[names(steps_med)=="steps.m"] <- "stepsmed"
-
-missing_steps_repl <- merge(missing_steps,steps_med,by="interval")
-
-myvars <- c("interval", "date", "stepsmed")
-
-missing_steps_OK <- missing_steps_repl[myvars]
-
-names(missing_steps_OK)[names(missing_steps_OK)=="stepsmed"] <- "steps"
 
 
 ```r
@@ -403,14 +319,11 @@ names(missing_steps_OK)[names(missing_steps_OK)=="stepsmed"] <- "steps"
 
 ###7a) Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
-data_repl <- rbind(dataOK,missing_steps_OK)
-
 
 ```r
 data_repl <- rbind(dataOK,missing_steps_OK)
 ```
 
-summary(data_repl)
 
 ```r
 summary(data_repl)
@@ -426,7 +339,6 @@ summary(data_repl)
 ##  Max.   :806   Max.   :2012-11-30   Max.   :2355.0
 ```
 
-summary(dataOK)
 
 ```r
 summary(dataOK)
@@ -444,17 +356,6 @@ summary(dataOK)
 
 
 ###7b) Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.
-
-library(doBy)
-
-steps_sum_repl <- summaryBy(steps ~ date, data = data_repl, 
- 	FUN = function(x) { c(m = sum(x)) } )
-
-names(steps_sum_repl)[names(steps_sum_repl)=="steps.m"] <- "steps.s"
-
-hist(	steps_sum_repl$steps.s, 
-	breaks=10, 
-	xlab="Total number of steps taken per day (NAs replaced with median)")
 
 
 ```r
@@ -478,7 +379,6 @@ Conclusion: Imputing missing data on the estimates of the total daily number of 
 
 ###7c) Calculating and reporting mean and median of total number of steps taken per day
 
-mean(steps_sum_repl$steps.s)
 
 ```r
 mean(steps_sum_repl$steps.s) 
@@ -488,7 +388,6 @@ mean(steps_sum_repl$steps.s)
 ## [1] 9503.869
 ```
 
-median(steps_sum_repl$steps.s) 
 
 ```r
 median(steps_sum_repl$steps.s) 
@@ -499,12 +398,6 @@ median(steps_sum_repl$steps.s)
 ```
 
 ###8a) Create a new factor variable in the dataset with two levels, weekday and weekend, indicating whether a given date is a weekday or weekend day.Used the dataset with the filled-in missing values for this part. 
-
-weektime <- ifelse((data_repl$date) %in% c("sabato","domenica"),"weekend","weekday")
-
-data_repl2 <- cbind(data_repl,weektime)
-
-table(data_repl2$weektime)
 
 
 ```r
@@ -524,22 +417,6 @@ table(data_repl2$weektime)
 
 
 ###8b) Make a panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).Used the dataset with the filled-in missing values for this part.
-
-library(doBy)
-
-steps_avg_final <- summaryBy(steps ~ interval + weektime, data = data_repl2, 
- 	FUN = function(x) { c(m = mean(x)) } )
-
-names(steps_avg_final)[names(steps_avg_final)=="steps.m"] <- "stepsavg"
-
-library("lattice")
-
-p <- xyplot(stepsavg ~ interval | factor(weektime), data=steps_avg_final, 
-       type = 'l',
-       main="Average number of steps (split by weekdays and weekend days",
-       xlab="5-minute interval",
-       ylab="Average number of steps")
-print (p)  
 
 
 ```r
