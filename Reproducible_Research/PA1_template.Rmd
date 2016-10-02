@@ -1,0 +1,374 @@
+---
+title: "Reproducible research - Course Project week1"
+author: "Claudio Caponera"
+date: "02 October 2016"
+output:
+  html_document:
+    keep_md: true
+---
+
+##Introduction
+
+It is now possible to collect a large amount of data about personal movement using activity monitoring devices such as a Fitbit, Nike Fuelband, or Jawbone Up. These type of devices are part of the "quantified self" movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. But these data remain under-utilized both because the raw data are hard to obtain and there is a lack of statistical methods and software for processing and interpreting the data.
+This assignment makes use of data from a personal activity monitoring device. This device collects data at 5 minute intervals throughout the day. The data consists of two months of data from an anonymous individual collected during the months of October and November, 2012 and include the number of steps taken in 5 minute intervals each day.
+
+##Data
+
+The dataset is stored in a comma-separated-value (CSV) file and there are a total of 17,568 observations in this dataset.
+
+The variables included in this dataset are:
+1) steps: Number of steps taking in a 5-minute interval (missing values are coded as NA)
+2) date: The date on which the measurement was taken in YYYY-MM-DD format
+3) interval: Identifier for the 5-minute interval in which measurement was taken
+
+
+###1) Reading data
+
+```{r, echo=FALSE}
+setwd("C:/Users/Claudio.Caponera/OneDrive for Business/Documents/datascience/Reproducible_Research")
+```
+
+data <- read.table(unz("repdata-data-activity.zip", "activity.csv"), 
+	header=T, quote="\"", sep=",")
+
+```{r, echo=FALSE}
+data <- read.table(unz("repdata-data-activity.zip", "activity.csv"), 
+	header=T, quote="\"", sep=",")
+```
+
+summary(data)
+
+```{r, echo=FALSE}
+summary(data)
+data$date <- as.Date(data$date) 
+```
+
+str(data)
+
+```{r, echo=FALSE}
+str(data)
+# 17568 obs. of  3 variables
+```
+
+head(data)
+
+```{r, echo=FALSE}
+head(data)
+```
+
+tail(data)
+
+```{r, echo=FALSE}
+tail(data)
+```
+
+###2) Missing values
+
+dataOK <- na.omit(data)
+
+str(dataOK)
+
+```{r, echo=FALSE}
+dataOK <- na.omit(data)
+str(dataOK)
+#15264 obs. of  3 variables
+```
+
+head(dataOK)
+
+```{r, echo=FALSE}
+head(dataOK)
+
+```
+
+
+###3) Calculating total number of steps taken per day - Making histogram
+
+days = length(unique(dataOK[,2]))
+
+library(doBy)
+
+steps_sum <- summaryBy(steps ~ date, data = dataOK, FUN = function(x) { c(m = sum(x)) } )
+
+names(steps_sum)[names(steps_sum)=="steps.m"] <- "steps.s"
+
+hist(	steps_sum$steps.s,breaks=10,xlab="Total number of steps taken per day")
+
+```{r, echo=FALSE}
+#counting distinct days
+days = length(unique(dataOK[,2]))
+days
+
+library(doBy)
+steps_sum <- summaryBy(steps ~ date, data = dataOK,	FUN = function(x) { c(m = sum(x)) } )
+
+#renaming column name
+names(steps_sum)[names(steps_sum)=="steps.m"] <- "steps.s"
+
+hist(	steps_sum$steps.s, breaks=10, xlab="Total number of steps taken per day")
+```
+
+
+###4) Calculating and reporting mean and median of total number of steps taken per day
+
+mean(steps_sum$steps.s)
+```{r, echo=FALSE}
+mean(steps_sum$steps.s) 
+```
+
+median(steps_sum$steps.s) 
+```{r, echo=FALSE}
+median(steps_sum$steps.s) 
+```
+
+###5) Calculate and plot average steps for each of 5-minute interval
+
+library(doBy)
+
+steps_avg <- summaryBy(steps ~ interval, data = dataOK, 
+ 	FUN = function(x) { c(m = mean(x)) } )
+
+names(steps_avg)[names(steps_avg)=="steps.m"] <- "stepsavg"
+
+library(ggplot2)
+
+qplot(x=interval, y=stepsavg, data = steps_avg,  geom = "line",
+      xlab="5-minute interval",
+      ylab="average number of steps taken, averaged across all days",
+      main="Average number of steps by interval"
+      )
+      
+```{r, echo=FALSE}
+library(doBy)
+steps_avg <- summaryBy(steps ~ interval, data = dataOK, 
+ 	FUN = function(x) { c(m = mean(x)) } )
+
+#renaming column name
+names(steps_avg)[names(steps_avg)=="steps.m"] <- "stepsavg"
+
+library(ggplot2)
+qplot(x=interval, y=stepsavg, data = steps_avg,  geom = "line",
+      xlab="5-minute interval",
+      ylab="average number of steps taken, averaged across all days",
+      main="Average number of steps by interval"
+      )
+```
+
+###6) Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
+steps_avg[which.max(steps_avg$stepsavg), ]
+```{r, echo=FALSE}
+steps_avg[which.max(steps_avg$stepsavg), ]
+```
+
+###7) Dealing with missing values: there are a number of days/intervals where there are missing values (coded as NA).
+
+missing_steps <- subset(data, is.na(data$steps))
+
+str(missing_steps)
+```{r, echo=FALSE}
+#7a) Calculate and report the total number of missing values in the dataset
+
+missing_steps <- subset(data, is.na(data$steps))
+str(missing_steps)
+# 2304 obs. of  3 variables
+```
+
+missing_date <- subset(data, is.na(data$date))
+
+str(missing_date)
+```{r, echo=FALSE}
+missing_date <- subset(data, is.na(data$date))
+str(missing_date)
+#0 obs. of  3 variables
+```
+
+missing_int <- subset(data, is.na(data$interval))
+
+str(missing_int)
+```{r, echo=FALSE}
+missing_int <- subset(data, is.na(data$interval))
+str(missing_int)
+#0 obs. of  3 variables
+```
+Conclusion: only in 'steps' column there are NA's. Where 'steps' is missing, this will be now replaced with the median
+
+library(doBy)
+
+steps_med <- summaryBy(steps ~ interval, data = dataOK, 
+ 	FUN = function(x) { c(m = median(x)) } )
+
+names(steps_med)[names(steps_med)=="steps.m"] <- "stepsmed"
+
+missing_steps_repl <- merge(missing_steps,steps_med,by="interval")
+
+myvars <- c("interval", "date", "stepsmed")
+
+missing_steps_OK <- missing_steps_repl[myvars]
+
+names(missing_steps_OK)[names(missing_steps_OK)=="stepsmed"] <- "steps" 
+
+library(doBy)
+
+steps_med <- summaryBy(steps ~ interval, data = dataOK, 
+ 	FUN = function(x) { c(m = median(x)) } )
+
+names(steps_med)[names(steps_med)=="steps.m"] <- "stepsmed"
+
+missing_steps_repl <- merge(missing_steps,steps_med,by="interval")
+
+myvars <- c("interval", "date", "stepsmed")
+
+missing_steps_OK <- missing_steps_repl[myvars]
+
+names(missing_steps_OK)[names(missing_steps_OK)=="stepsmed"] <- "steps"
+
+```{r, echo=FALSE}
+##7b) Where steps is missing, replacing with median.
+
+library(doBy)
+steps_med <- summaryBy(steps ~ interval, data = dataOK, 
+ 	FUN = function(x) { c(m = median(x)) } )
+
+names(steps_med)[names(steps_med)=="steps.m"] <- "stepsmed"
+
+missing_steps_repl <- merge(missing_steps,steps_med,by="interval")
+
+myvars <- c("interval", "date", "stepsmed")
+missing_steps_OK <- missing_steps_repl[myvars]
+names(missing_steps_OK)[names(missing_steps_OK)=="stepsmed"] <- "steps" 
+
+#b1) calculating median for intervals
+
+library(doBy)
+steps_med <- summaryBy(steps ~ interval, data = dataOK, 
+ 	FUN = function(x) { c(m = median(x)) } )
+
+#renaming column name
+names(steps_med)[names(steps_med)=="steps.m"] <- "stepsmed"
+
+#b2) merging missing_steps with steps_median
+#    replace with interval-steps-median where steps is missing
+
+missing_steps_repl <- merge(missing_steps,steps_med,by="interval")
+
+myvars <- c("interval", "date", "stepsmed")
+missing_steps_OK <- missing_steps_repl[myvars]
+names(missing_steps_OK)[names(missing_steps_OK)=="stepsmed"] <- "steps" 
+```
+
+###7a) Create a new dataset that is equal to the original dataset but with the missing data filled in.
+
+data_repl <- rbind(dataOK,missing_steps_OK)
+
+```{r, echo=FALSE}
+data_repl <- rbind(dataOK,missing_steps_OK)
+```
+
+summary(data_repl)
+```{r, echo=FALSE}
+summary(data_repl)
+```
+
+summary(dataOK)
+```{r, echo=FALSE}
+summary(dataOK)
+```  
+
+
+###7b) Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.
+
+library(doBy)
+
+steps_sum_repl <- summaryBy(steps ~ date, data = data_repl, 
+ 	FUN = function(x) { c(m = sum(x)) } )
+
+names(steps_sum_repl)[names(steps_sum_repl)=="steps.m"] <- "steps.s"
+
+hist(	steps_sum_repl$steps.s, 
+	breaks=10, 
+	xlab="Total number of steps taken per day (NAs replaced with median)")
+
+```{r, echo=FALSE}
+# d1) Calculating total number of steps taken per day - making histogram
+
+library(doBy)
+steps_sum_repl <- summaryBy(steps ~ date, data = data_repl, 
+ 	FUN = function(x) { c(m = sum(x)) } )
+
+#renaming column name
+names(steps_sum_repl)[names(steps_sum_repl)=="steps.m"] <- "steps.s"
+
+hist(	steps_sum_repl$steps.s, 
+	breaks=10, 
+	xlab="Total number of steps taken per day (NAs replaced with median)")
+```
+
+Conclusion: Imputing missing data on the estimates of the total daily number of steps, the mean of steps goes from 33 to 38. 
+
+###7c) Calculating and reporting mean and median of total number of steps taken per day
+
+mean(steps_sum_repl$steps.s)
+```{r, echo=FALSE}
+mean(steps_sum_repl$steps.s) 
+```
+
+median(steps_sum_repl$steps.s) 
+```{r, echo=FALSE}
+median(steps_sum_repl$steps.s) 
+```
+
+###8a) Create a new factor variable in the dataset with two levels, weekday and weekend, indicating whether a given date is a weekday or weekend day.Used the dataset with the filled-in missing values for this part. 
+
+weektime <- ifelse((data_repl$date) %in% c("sabato","domenica"),"weekend","weekday")
+
+data_repl2 <- cbind(data_repl,weektime)
+
+table(data_repl2$weektime)
+
+```{r, echo=FALSE}
+data_repl$date <- weekdays(as.Date(data_repl$date))
+
+weektime <- ifelse((data_repl$date) %in% c("sabato","domenica"),"weekend","weekday")
+data_repl2 <- cbind(data_repl,weektime)
+
+table(data_repl2$weektime)
+```
+
+
+###8b) Make a panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).Used the dataset with the filled-in missing values for this part.
+
+library(doBy)
+
+steps_avg_final <- summaryBy(steps ~ interval + weektime, data = data_repl2, 
+ 	FUN = function(x) { c(m = mean(x)) } )
+
+names(steps_avg_final)[names(steps_avg_final)=="steps.m"] <- "stepsavg"
+
+library("lattice")
+
+p <- xyplot(stepsavg ~ interval | factor(weektime), data=steps_avg_final, 
+       type = 'l',
+       main="Average number of steps (split by weekdays and weekend days",
+       xlab="5-minute interval",
+       ylab="Average number of steps")
+print (p)  
+
+```{r, echo=FALSE}
+library(doBy)
+steps_avg_final <- summaryBy(steps ~ interval + weektime, data = data_repl2, 
+ 	FUN = function(x) { c(m = mean(x)) } )
+
+#renaming column name
+names(steps_avg_final)[names(steps_avg_final)=="steps.m"] <- "stepsavg"
+
+library("lattice")
+p <- xyplot(stepsavg ~ interval | factor(weektime), data=steps_avg_final, 
+       type = 'l',
+       main="Average number of steps (split by weekdays and weekend days",
+       xlab="5-minute interval",
+       ylab="Average number of steps")
+print (p)    
+```   
+
+Conclusion: Yes, there are there differences in activity patterns between weekdays and weekends. The plot shows how the activity is higher during the weekend days.
