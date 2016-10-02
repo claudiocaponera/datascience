@@ -20,14 +20,25 @@ The variables included in this dataset are:
 ###1) Reading data
 
 
+```r
+setwd("C:/Users/Claudio.Caponera/OneDrive for Business/Documents/datascience/Reproducible_Research")
+```
 
 data <- read.table(unz("repdata-data-activity.zip", "activity.csv"), 
 	header=T, quote="\"", sep=",")
 
 
+```r
+data <- read.table(unz("repdata-data-activity.zip", "activity.csv"), 
+	header=T, quote="\"", sep=",")
+```
 
 summary(data)
 
+
+```r
+summary(data)
+```
 
 ```
 ##      steps                date          interval     
@@ -40,8 +51,16 @@ summary(data)
 ##  NA's   :2304     (Other)   :15840
 ```
 
+```r
+data$date <- as.Date(data$date) 
+```
+
 str(data)
 
+
+```r
+str(data)
+```
 
 ```
 ## 'data.frame':	17568 obs. of  3 variables:
@@ -50,8 +69,16 @@ str(data)
 ##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
+```r
+# 17568 obs. of  3 variables
+```
+
 head(data)
 
+
+```r
+head(data)
+```
 
 ```
 ##   steps       date interval
@@ -65,6 +92,10 @@ head(data)
 
 tail(data)
 
+
+```r
+tail(data)
+```
 
 ```
 ##       steps       date interval
@@ -83,6 +114,11 @@ dataOK <- na.omit(data)
 str(dataOK)
 
 
+```r
+dataOK <- na.omit(data)
+str(dataOK)
+```
+
 ```
 ## 'data.frame':	15264 obs. of  3 variables:
 ##  $ steps   : int  0 0 0 0 0 0 0 0 0 0 ...
@@ -92,8 +128,16 @@ str(dataOK)
 ##   .. ..- attr(*, "names")= chr [1:2304] "1" "2" "3" "4" ...
 ```
 
+```r
+#15264 obs. of  3 variables
+```
+
 head(dataOK)
 
+
+```r
+head(dataOK)
+```
 
 ```
 ##     steps       date interval
@@ -119,12 +163,31 @@ names(steps_sum)[names(steps_sum)=="steps.m"] <- "steps.s"
 hist(	steps_sum$steps.s,breaks=10,xlab="Total number of steps taken per day")
 
 
+```r
+#counting distinct days
+days = length(unique(dataOK[,2]))
+days
+```
+
 ```
 ## [1] 53
 ```
 
+```r
+library(doBy)
+```
+
 ```
 ## Warning: package 'doBy' was built under R version 3.2.5
+```
+
+```r
+steps_sum <- summaryBy(steps ~ date, data = dataOK,	FUN = function(x) { c(m = sum(x)) } )
+
+#renaming column name
+names(steps_sum)[names(steps_sum)=="steps.m"] <- "steps.s"
+
+hist(	steps_sum$steps.s, breaks=10, xlab="Total number of steps taken per day")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
@@ -134,11 +197,19 @@ hist(	steps_sum$steps.s,breaks=10,xlab="Total number of steps taken per day")
 
 mean(steps_sum$steps.s)
 
+```r
+mean(steps_sum$steps.s) 
+```
+
 ```
 ## [1] 10766.19
 ```
 
 median(steps_sum$steps.s) 
+
+```r
+median(steps_sum$steps.s) 
+```
 
 ```
 ## [1] 10765
@@ -162,8 +233,27 @@ qplot(x=interval, y=stepsavg, data = steps_avg,  geom = "line",
       )
       
 
+```r
+library(doBy)
+steps_avg <- summaryBy(steps ~ interval, data = dataOK, 
+ 	FUN = function(x) { c(m = mean(x)) } )
+
+#renaming column name
+names(steps_avg)[names(steps_avg)=="steps.m"] <- "stepsavg"
+
+library(ggplot2)
+```
+
 ```
 ## Warning: package 'ggplot2' was built under R version 3.2.5
+```
+
+```r
+qplot(x=interval, y=stepsavg, data = steps_avg,  geom = "line",
+      xlab="5-minute interval",
+      ylab="average number of steps taken, averaged across all days",
+      main="Average number of steps by interval"
+      )
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
@@ -171,6 +261,10 @@ qplot(x=interval, y=stepsavg, data = steps_avg,  geom = "line",
 ###6) Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 steps_avg[which.max(steps_avg$stepsavg), ]
+
+```r
+steps_avg[which.max(steps_avg$stepsavg), ]
+```
 
 ```
 ##     interval stepsavg
@@ -183,6 +277,13 @@ missing_steps <- subset(data, is.na(data$steps))
 
 str(missing_steps)
 
+```r
+#7a) Calculate and report the total number of missing values in the dataset
+
+missing_steps <- subset(data, is.na(data$steps))
+str(missing_steps)
+```
+
 ```
 ## 'data.frame':	2304 obs. of  3 variables:
 ##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
@@ -190,26 +291,48 @@ str(missing_steps)
 ##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
+```r
+# 2304 obs. of  3 variables
+```
+
 missing_date <- subset(data, is.na(data$date))
 
 str(missing_date)
+
+```r
+missing_date <- subset(data, is.na(data$date))
+str(missing_date)
+```
 
 ```
 ## 'data.frame':	0 obs. of  3 variables:
 ##  $ steps   : int 
 ##  $ date    :Class 'Date'  num(0) 
 ##  $ interval: int
+```
+
+```r
+#0 obs. of  3 variables
 ```
 
 missing_int <- subset(data, is.na(data$interval))
 
 str(missing_int)
 
+```r
+missing_int <- subset(data, is.na(data$interval))
+str(missing_int)
+```
+
 ```
 ## 'data.frame':	0 obs. of  3 variables:
 ##  $ steps   : int 
 ##  $ date    :Class 'Date'  num(0) 
 ##  $ interval: int
+```
+
+```r
+#0 obs. of  3 variables
 ```
 Conclusion: only in 'steps' column there are NA's. Where 'steps' is missing, this will be now replaced with the median
 
@@ -244,14 +367,54 @@ missing_steps_OK <- missing_steps_repl[myvars]
 names(missing_steps_OK)[names(missing_steps_OK)=="stepsmed"] <- "steps"
 
 
+```r
+##7b) Where steps is missing, replacing with median.
+
+library(doBy)
+steps_med <- summaryBy(steps ~ interval, data = dataOK, 
+ 	FUN = function(x) { c(m = median(x)) } )
+
+names(steps_med)[names(steps_med)=="steps.m"] <- "stepsmed"
+
+missing_steps_repl <- merge(missing_steps,steps_med,by="interval")
+
+myvars <- c("interval", "date", "stepsmed")
+missing_steps_OK <- missing_steps_repl[myvars]
+names(missing_steps_OK)[names(missing_steps_OK)=="stepsmed"] <- "steps" 
+
+#b1) calculating median for intervals
+
+library(doBy)
+steps_med <- summaryBy(steps ~ interval, data = dataOK, 
+ 	FUN = function(x) { c(m = median(x)) } )
+
+#renaming column name
+names(steps_med)[names(steps_med)=="steps.m"] <- "stepsmed"
+
+#b2) merging missing_steps with steps_median
+#    replace with interval-steps-median where steps is missing
+
+missing_steps_repl <- merge(missing_steps,steps_med,by="interval")
+
+myvars <- c("interval", "date", "stepsmed")
+missing_steps_OK <- missing_steps_repl[myvars]
+names(missing_steps_OK)[names(missing_steps_OK)=="stepsmed"] <- "steps" 
+```
 
 ###7a) Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
 data_repl <- rbind(dataOK,missing_steps_OK)
 
 
+```r
+data_repl <- rbind(dataOK,missing_steps_OK)
+```
 
 summary(data_repl)
+
+```r
+summary(data_repl)
+```
 
 ```
 ##      steps          date               interval     
@@ -264,6 +427,10 @@ summary(data_repl)
 ```
 
 summary(dataOK)
+
+```r
+summary(dataOK)
+```
 
 ```
 ##      steps             date               interval     
@@ -289,6 +456,22 @@ hist(	steps_sum_repl$steps.s,
 	breaks=10, 
 	xlab="Total number of steps taken per day (NAs replaced with median)")
 
+
+```r
+# d1) Calculating total number of steps taken per day - making histogram
+
+library(doBy)
+steps_sum_repl <- summaryBy(steps ~ date, data = data_repl, 
+ 	FUN = function(x) { c(m = sum(x)) } )
+
+#renaming column name
+names(steps_sum_repl)[names(steps_sum_repl)=="steps.m"] <- "steps.s"
+
+hist(	steps_sum_repl$steps.s, 
+	breaks=10, 
+	xlab="Total number of steps taken per day (NAs replaced with median)")
+```
+
 ![](PA1_template_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
 
 Conclusion: Imputing missing data on the estimates of the total daily number of steps, the mean of steps goes from 33 to 38. 
@@ -297,11 +480,19 @@ Conclusion: Imputing missing data on the estimates of the total daily number of 
 
 mean(steps_sum_repl$steps.s)
 
+```r
+mean(steps_sum_repl$steps.s) 
+```
+
 ```
 ## [1] 9503.869
 ```
 
 median(steps_sum_repl$steps.s) 
+
+```r
+median(steps_sum_repl$steps.s) 
+```
 
 ```
 ## [1] 10395
@@ -315,6 +506,15 @@ data_repl2 <- cbind(data_repl,weektime)
 
 table(data_repl2$weektime)
 
+
+```r
+data_repl$date <- weekdays(as.Date(data_repl$date))
+
+weektime <- ifelse((data_repl$date) %in% c("sabato","domenica"),"weekend","weekday")
+data_repl2 <- cbind(data_repl,weektime)
+
+table(data_repl2$weektime)
+```
 
 ```
 ## 
@@ -340,6 +540,24 @@ p <- xyplot(stepsavg ~ interval | factor(weektime), data=steps_avg_final,
        xlab="5-minute interval",
        ylab="Average number of steps")
 print (p)  
+
+
+```r
+library(doBy)
+steps_avg_final <- summaryBy(steps ~ interval + weektime, data = data_repl2, 
+ 	FUN = function(x) { c(m = mean(x)) } )
+
+#renaming column name
+names(steps_avg_final)[names(steps_avg_final)=="steps.m"] <- "stepsavg"
+
+library("lattice")
+p <- xyplot(stepsavg ~ interval | factor(weektime), data=steps_avg_final, 
+       type = 'l',
+       main="Average number of steps (split by weekdays and weekend days",
+       xlab="5-minute interval",
+       ylab="Average number of steps")
+print (p)    
+```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
 
