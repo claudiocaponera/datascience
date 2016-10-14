@@ -13,6 +13,10 @@ Storms and other severe weather events can cause both public health and economic
 
 This project involves exploring the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database. This database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, and property damage.
 
+##Synopsis
+
+
+
 ##Data
 
 The data for this assignment come in the form of a comma-separated-value file compressed via the bzip2 algorithm to reduce its size.
@@ -30,11 +34,14 @@ download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.
 data <- data.table(read.csv("./stormdata.csv.bz2"))
 ```
 
+##Data Processing: how the data were loaded into R and processed for analysis
+
+#Across the United States, which types of events (as indicated in the EVTYPE variable) are most harmful with respect to population health?
 
 
+#Across the United States, which types of events have the greatest economic consequences?
 
 
-
-
+#Results (between 1-3 plots)
 
 
