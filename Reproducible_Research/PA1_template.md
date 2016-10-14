@@ -160,10 +160,40 @@ steps_sum <- summaryBy(steps ~ date, data = dataOK,	FUN = function(x) { c(m = su
 #renaming column name
 names(steps_sum)[names(steps_sum)=="steps.m"] <- "steps.s"
 
-hist(	steps_sum$steps.s, breaks=10, xlab="Total number of steps taken per day")
+hist <- hist(	steps_sum$steps.s, breaks=10, xlab="Total number of steps taken per day")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+
+```r
+hist
+```
+
+```
+## $breaks
+##  [1]     0  2000  4000  6000  8000 10000 12000 14000 16000 18000 20000
+## [12] 22000
+## 
+## $counts
+##  [1]  2  2  3  3  7 16 10  7  1  0  2
+## 
+## $density
+##  [1] 1.886792e-05 1.886792e-05 2.830189e-05 2.830189e-05 6.603774e-05
+##  [6] 1.509434e-04 9.433962e-05 6.603774e-05 9.433962e-06 0.000000e+00
+## [11] 1.886792e-05
+## 
+## $mids
+##  [1]  1000  3000  5000  7000  9000 11000 13000 15000 17000 19000 21000
+## 
+## $xname
+## [1] "steps_sum$steps.s"
+## 
+## $equidist
+## [1] TRUE
+## 
+## attr(,"class")
+## [1] "histogram"
+```
 
 
 ###4) Calculating and reporting mean and median of total number of steps taken per day
@@ -322,10 +352,6 @@ names(missing_steps_OK)[names(missing_steps_OK)=="stepsmed"] <- "steps"
 
 ```r
 data_repl <- rbind(dataOK,missing_steps_OK)
-```
-
-
-```r
 summary(data_repl)
 ```
 
@@ -338,7 +364,6 @@ summary(data_repl)
 ##  3rd Qu.:  8   3rd Qu.:2012-11-15   3rd Qu.:1766.2  
 ##  Max.   :806   Max.   :2012-11-30   Max.   :2355.0
 ```
-
 
 ```r
 summary(dataOK)
@@ -353,7 +378,6 @@ summary(dataOK)
 ##  3rd Qu.: 12.00   3rd Qu.:2012-11-16   3rd Qu.:1766.2  
 ##  Max.   :806.00   Max.   :2012-11-29   Max.   :2355.0
 ```
-
 
 ###7b) Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.
 
@@ -373,7 +397,7 @@ hist(	steps_sum_repl$steps.s,
 	xlab="Total number of steps taken per day (NAs replaced with median)")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
 
 Conclusion: Imputing missing data on the estimates of the total daily number of steps, the mean of steps goes from 33 to 38. 
 
@@ -436,6 +460,6 @@ p <- xyplot(stepsavg ~ interval | factor(weektime), data=steps_avg_final,
 print (p)    
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
 
 Conclusion: Yes, there are there differences in activity patterns between weekdays and weekends. The plot shows how the activity is higher during the weekend days.

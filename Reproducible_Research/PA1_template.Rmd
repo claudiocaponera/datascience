@@ -78,7 +78,8 @@ steps_sum <- summaryBy(steps ~ date, data = dataOK,	FUN = function(x) { c(m = su
 #renaming column name
 names(steps_sum)[names(steps_sum)=="steps.m"] <- "steps.s"
 
-hist(	steps_sum$steps.s, breaks=10, xlab="Total number of steps taken per day")
+hist <- hist(	steps_sum$steps.s, breaks=10, xlab="Total number of steps taken per day")
+hist
 ```
 
 
@@ -177,16 +178,9 @@ names(missing_steps_OK)[names(missing_steps_OK)=="stepsmed"] <- "steps"
 
 ```{r, echo=TRUE}
 data_repl <- rbind(dataOK,missing_steps_OK)
-```
-
-```{r, echo=TRUE}
 summary(data_repl)
-```
-
-```{r, echo=TRUE}
 summary(dataOK)
-```  
-
+```
 
 ###7b) Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.
 
