@@ -7,41 +7,89 @@ output:
     keep_md: true
 ---
 
-##Introduction
-
-Storms and other severe weather events can cause both public health and economic problems for communities and municipalities. Many severe events can result in fatalities, injuries, and property damage, and preventing such outcomes to the extent possible is a key concern.
-
-This project involves exploring the U.S. National Oceanic and Atmospheric Administration's (NOAA) storm database. This database tracks characteristics of major storms and weather events in the United States, including when and where they occur, as well as estimates of any fatalities, injuries, and property damage.
-
 ##Synopsis
 
+Storms and other severe weather events can cause both public health and economic problems for communities and municipalities in the U.S. Many severe events can result in fatalities, injuries, and property damage, and preventing such outcomes to the extent possible is a key concern. The aim of this analysis is to identify which types of events are most harmful with respect to population health and which types of events have the greatest economic consequences. The project is based on the U.S. National Oceanic and Atmospheric Administration's storm database, which tracks characteristics of major storms and weather events in the U.S. Tornado has resulted as the most harmful event to health, flood the event with the gratest economic consequences.
 
-
-##Data
+##Data processing
 
 The data for this assignment come in the form of a comma-separated-value file compressed via the bzip2 algorithm to reduce its size.
 
 The events in the database start in the year 1950 and end in November 2011. In the earlier years of the database there are generally fewer events recorded, most likely due to a lack of good records. More recent years should be considered more complete.
 
-#Downloading and reading data in
-
-```r
+```{r, echo=TRUE}
 rm(list = ls())
 
 setwd("C:/Users/Claudio.Caponera/OneDrive for Business/Documents/datascience/Reproducible_Research")
 
 download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2",destfile="./stormdata.csv.bz2")
-data <- data.table(read.csv("./stormdata.csv.bz2"))
+data <- read.csv("./stormdata.csv.bz2")
+library(data.table)
+data <- data.table(data)
+
+str(data)
+head(data)
+
+data$EVTYPE <- tolower(data$EVTYPE)
+
+summary(data$INJURIES)
+summary(data$FATALITIES)
+
+data$PROPDMG <- as.numeric(data$PROPDMG)
+data$CROPDMG <- as.numeric(data$CROPDMG)
+summary(data$PROPDMG)
+summary(data$CROPDMG)
+
+data$CROPDMGEXP <- tolower(data$CROPDMGEXP)
+data$PROPDMGEXP <- tolower(data$PROPDMGEXP)
+table(data$CROPDMGEXP, exclude=NULL)
+table(data$PROPDMGEXP, exclude=NULL)
+
+#frequency table of EVTYPE
+freq <- data.frame(table(data$EVTYPE, exclude=NULL))
+freq <- freq[order(-freq$Freq), ]
+freq$rel_freq <- round((freq$Freq/sum(freq$Freq)),digits=5)
+freq$rel_freq_c <- cumsum(freq$rel_freq)
+
+#looking at first most common events (90% data covered)
+mce_freq <- head(freq,10)
+mce <- data[EVTYPE %in% mce_freq$Var1]
+#rm(data)
 ```
 
-##Data Processing: how the data were loaded into R and processed for analysis
+##Results
 
-#Across the United States, which types of events (as indicated in the EVTYPE variable) are most harmful with respect to population health?
+###1.Across the U.S., which types of events are most harmful with respect to population health?
 
+```{r, echo=TRUE}
 
-#Across the United States, which types of events have the greatest economic consequences?
+summ <- mce[,list(tot_INJURIES=sum(INJURIES,na.rm=TRUE), tot_FATALITIES=sum(FATALITIES,na.rm=TRUE)), by = EVTYPE]
+summ 
 
+library(ggplot2)
 
-#Results (between 1-3 plots)
+a <- ggplot(mce,aes(EVTYPE, FATALITIES)) + geom_bar(stat = "identity") + ylab("fatalities") + xlab("event") + ggtitle("Top ten events causing deaths across the U.S")
+a
+
+b <- ggplot(mce,aes(EVTYPE, INJURIES)) + geom_bar(stat = "identity") + ylab("fatalities") + xlab("event") + ggtitle("Top ten events causing injuries across the U.S")
+b
+```
+
+###2.Across the United States, which types of events have the greatest economic consequences?
+
+```{r, echo=TRUE}
+gec <- mce[PROPDMG > 0 & PROPDMGEXP %in% c("k","m","b") & CROPDMG > 0 & CROPDMGEXP %in% c("k","m","b"), ]
+
+gec$CROPDMGEXP <- as.numeric(lapply(gec$CROPDMGEXP, function(x) if (x=="h") 100 else if (x=="k") 1000 else if (x=="m") 1e+06 else if (x=="b") 1e+09 else 0 ))
+
+gec$PROPDMGEXP <- as.numeric(lapply(gec$PROPDMGEXP, function(x) if (x=="h") 100 else if (x=="k") 1000 else if (x=="m") 1e+06 else if (x=="b") 1e+09 else 0 ))
+
+summ2 <- gec[,list(PRODMG_summ=sum(PROPDMG*PROPDMGEXP,na.rm=TRUE), CROPDMG_summ=sum(CROPDMG*CROPDMGEXP,na.rm=TRUE)), by = EVTYPE]
+summ2 <- data.frame(summ2)
+summ2$PRODMG_CROPDMG_summ <- rowSums(summ2[,c("PRODMG_summ","CROPDMG_summ")],na.rm=TRUE)
+
+c <- ggplot(summ2,aes(EVTYPE, PRODMG_CROPDMG_summ/1000000)) + geom_bar(stat = "identity") + ylab("Damages amount in Million$") + xlab("event") + ggtitle("Greatest economic consequences per event type")
+c
+```
 
 
