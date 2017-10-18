@@ -1,0 +1,14 @@
+.httr-oauth
+.Rproj.user
+.Rhistory
+.RData
+*.
+*.html
+*.css
+*.js
+*.woff
+*.scss
+*.svg
+*.yml
+*.mp4
+
