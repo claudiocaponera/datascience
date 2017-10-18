@@ -1,4 +1,4 @@
-# Reproducible research - Course Project week2
+# Health and economic consequences of weather events in the U.S.
 Claudio Caponera  
 14 October 2016  
 
@@ -196,7 +196,7 @@ mce <- data[EVTYPE %in% mce_freq$Var1]
 
 ##Results
 
-###1.Across the U.S., which types of events are most harmful with respect to population health?
+###1.Which types of events are most harmful with respect to population health?
 
 
 ```r
@@ -240,7 +240,7 @@ b
 
 ![](PA2_storm_data_analysis_files/figure-html/unnamed-chunk-2-2.png)<!-- -->
 
-###2.Across the United States, which types of events have the greatest economic consequences?
+###2.Which types of events have the greatest economic consequences?
 
 
 ```r
